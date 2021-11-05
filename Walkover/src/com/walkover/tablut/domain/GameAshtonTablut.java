@@ -84,7 +84,7 @@ public class GameAshtonTablut implements Game {
 		loggGame.fine("Stato:\n" + state.toString());
 		drawConditions = new ArrayList<State>();
 		this.citadels = new ArrayList<String>();
-		// this.strangeCitadels = new ArrayList<String>();
+
 		this.citadels.add("a4");
 		this.citadels.add("a5");
 		this.citadels.add("a6");
@@ -101,10 +101,7 @@ public class GameAshtonTablut implements Game {
 		this.citadels.add("e9");
 		this.citadels.add("f9");
 		this.citadels.add("e8");
-		// this.strangeCitadels.add("e1");
-		// this.strangeCitadels.add("a5");
-		// this.strangeCitadels.add("i5");
-		// this.strangeCitadels.add("e9");
+
 	}
 
 	@Override
