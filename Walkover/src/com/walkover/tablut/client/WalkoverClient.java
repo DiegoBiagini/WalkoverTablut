@@ -7,6 +7,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class WalkoverClient extends TablutClient{
 
@@ -58,9 +59,10 @@ public class WalkoverClient extends TablutClient{
         }
 
         State state = new StateTablut();
-        Game rules = new GameAshtonTablut(99, 0, "garbage", "fake", "fake");
+        GameAshtonTablut rules = new GameAshtonTablut(99, 0, "garbage", "fake", "fake");
         state.setTurn(State.Turn.WHITE);
 
+        ActiveBoard board = new ActiveBoard(state, rules);
 
         System.out.println("You are player " + this.getPlayer().toString() + "!");
 
@@ -72,11 +74,12 @@ public class WalkoverClient extends TablutClient{
                 System.exit(1);
             }
 
-            System.out.println("Current state:");
-            state = getCurrentState();
-            System.out.println(state.toString());
+            board.setGameState(getCurrentState());
 
-            State.Turn currentTurn = state.getTurn();
+            System.out.println("Current state:");
+            System.out.println(board.getGameState().toString());
+
+            State.Turn currentTurn = board.getTurn();
 
             if (currentTurn.equals(StateTablut.Turn.WHITEWIN)) {
                 if(getPlayer() == StateTablut.Turn.WHITE)
@@ -100,7 +103,16 @@ public class WalkoverClient extends TablutClient{
                 // TODO: my turn
                 // Generate moves
                 // Start minimax/negamax
-                break;
+                ArrayList<Action> possibleMoves = board.generateMoves();
+                int choice = ThreadLocalRandom.current().nextInt(0, possibleMoves.size());
+                Action chosenMove = possibleMoves.get(choice);
+
+                System.out.println("Mossa scelta: " + chosenMove.toString());
+                try {
+                    this.write(chosenMove);
+                } catch (ClassNotFoundException | IOException e) {
+                    e.printStackTrace();
+                }
             }
             else if ( !currentTurn.equals(getPlayer())) {
                 System.out.println("Waiting for your opponent move... ");

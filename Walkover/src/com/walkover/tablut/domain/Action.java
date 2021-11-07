@@ -19,6 +19,12 @@ public class Action implements Serializable {
 
 	private State.Turn turn;
 
+	public Action(Coordinate from, Coordinate to, StateTablut.Turn t){
+		this.from = from.getHumanCoordinate();
+		this.to = to.getHumanCoordinate();
+		this.turn = t;
+	}
+
 	public Action(String from, String to, StateTablut.Turn t) throws IOException {
 		if (from.length() != 2 || to.length() != 2) {
 			throw new InvalidParameterException("the FROM and the TO string must have length=2");
@@ -83,6 +89,14 @@ public class Action implements Serializable {
 	 */
 	public int getRowTo() {
 		return Integer.parseInt(this.to.charAt(1) + "") - 1;
+	}
+
+	public void toCoordinate(Coordinate f, Coordinate t){
+		f.x = from.charAt(1) - 49;
+		f.y = from.charAt(0) -97;
+
+		t.x = to.charAt(1) - 49;
+		t.y = to.charAt(0) -97;
 	}
 
 }
