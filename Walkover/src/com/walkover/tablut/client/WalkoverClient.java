@@ -100,13 +100,7 @@ public class WalkoverClient extends TablutClient{
                 System.exit(0);
             }
             else if (currentTurn.equals(getPlayer())) {
-                // TODO: my turn
-                // Generate moves
-                // Start minimax/negamax
-                ArrayList<Action> possibleMoves = board.generateMoves();
-                int choice = ThreadLocalRandom.current().nextInt(0, possibleMoves.size());
-                Action chosenMove = possibleMoves.get(choice);
-
+                Action chosenMove =  simpleRandomBehaviour(board);
                 System.out.println("Mossa scelta: " + chosenMove.toString());
                 try {
                     this.write(chosenMove);
@@ -118,5 +112,11 @@ public class WalkoverClient extends TablutClient{
                 System.out.println("Waiting for your opponent move... ");
             }
         }
+    }
+
+    private Action simpleRandomBehaviour(ActiveBoard board){
+        ArrayList<Action> possibleMoves = board.generateMoves();
+        int choice = ThreadLocalRandom.current().nextInt(0, possibleMoves.size());
+        return possibleMoves.get(choice);
     }
 }

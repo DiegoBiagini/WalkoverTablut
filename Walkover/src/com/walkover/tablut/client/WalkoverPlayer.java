@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class WalkoverPlayer {
     public static void main(String[] args) throws IOException, ClassNotFoundException, PawnException, DiagonalException, ClimbingException, ActionException, CitadelException, StopException, OccupitedException, BoardException, ClimbingCitadelException, ThroneException {
-        //WalkoverClient.main(args);
+        WalkoverClient.main(args);
 
         State state = new StateTablut();
         state.setTurn(State.Turn.WHITE);
@@ -45,7 +45,4 @@ public class WalkoverPlayer {
             */
     }
 
-    public static void test(State.Pawn p){
-        p = State.Pawn.WHITE;
-    }
 }

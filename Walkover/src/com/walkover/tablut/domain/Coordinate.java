@@ -3,32 +3,32 @@ package com.walkover.tablut.domain;
 import java.util.Objects;
 
 public class Coordinate {
-    public int x;
-    public int y;
+    public int r;
+    public int c;
 
-    public Coordinate(int x, int y){
-        this.x = x;
-        this.y = y;
+    public Coordinate(int r, int c){
+        this.r = r;
+        this.c = c;
     }
 
     public Coordinate(){
-        this.x = -1;
-        this.y = -1;
+        this.r = -1;
+        this.c = -1;
     }
 
     public Coordinate(String c_string){
         if(c_string.length() != 2){
-            this.x = -1;
-            this.y = -1;
+            this.r = -1;
+            this.c = -1;
         }
-        this.x = (int)(c_string.charAt(1)) - 49;
-        this.y = (int)(c_string.charAt(0)) - 97;
+        this.r = (int)(c_string.charAt(1)) - 49;
+        this.c = (int)(c_string.charAt(0)) - 97;
     }
 
     public String getHumanCoordinate(){
         String ret;
-        char col = (char) (y + 97);
-        ret = col + "" + (x + 1);
+        char col = (char) (c + 97);
+        ret = col + "" + (r + 1);
         return ret;
     }
 
@@ -37,19 +37,19 @@ public class Coordinate {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Coordinate that = (Coordinate) o;
-        return x == that.x && y == that.y;
+        return r == that.r && c == that.c;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(x, y);
+        return Objects.hash(r, c);
     }
 
     @Override
     public String toString() {
         return "Coordinate{" +
-                "x=" + x +
-                ", y=" + y +
+                "x=" + r +
+                ", y=" + c +
                 '}';
     }
 }

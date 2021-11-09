@@ -46,7 +46,7 @@ public class ActiveBoard {
 
     }
 
-    public boolean performMove(Action move) throws PawnException, DiagonalException, ClimbingException, ActionException, CitadelException, StopException, OccupitedException, BoardException, ClimbingCitadelException, ThroneException {
+    public boolean performMoveOld(Action move) throws PawnException, DiagonalException, ClimbingException, ActionException, CitadelException, StopException, OccupitedException, BoardException, ClimbingCitadelException, ThroneException {
         lastTaken.clear();
         State.Turn previousTurn = getTurn();
         //TODO: improve this function
@@ -101,8 +101,66 @@ public class ActiveBoard {
         return result;
     }
 
-    public String revertMove(){
-        return "";
+    // This function does not check for move validity, for speed reasons ofc
+    public void performMove(Action move) throws PawnException, DiagonalException, ClimbingException, ActionException, CitadelException, StopException, OccupitedException, BoardException, ClimbingCitadelException, ThroneException {
+        lastTaken.clear();
+        State.Turn currentTurn = getTurn();
+        Coordinate from = new Coordinate();
+        Coordinate to = new Coordinate();
+
+        // MOVE AND CHANGE TURN
+        move.toCoordinate(from, to);
+        gameState.setPawn(to.r, to.c, gameState.getPawn(from.r, from.c));
+        if (from.c == 4 && from.r == 4) {
+            gameState.setPawn(from.r, from.c,State.Pawn.THRONE);
+        } else {
+            gameState.setPawn(from.r, from.c,State.Pawn.EMPTY);
+        }
+        switchTurn();
+
+        // CHECK CAPTURES
+        if (getTurn().equalsTurn("W")) {
+            checkCaptureBlack(move);
+            checkCaptureBlackKing(move);
+        } else if (getTurn().equalsTurn("B")) {
+            checkCaptureWhite(move);
+        }
+        // UPDATE POSITIONS
+        if (currentTurn.equals(State.Turn.WHITE)){
+            if(king.equals(from))
+                king = to;
+            else{
+                for(int i = 0; i < whitePawns.size();i++){
+                    if(whitePawns.get(i).equals(from)){
+                        whitePawns.set(i, to);
+                        break;
+                    }
+                }
+            }
+            for (Coordinate coordinate : lastTaken)
+                blackPawns.remove(coordinate);
+        }
+        else if (currentTurn.equals(State.Turn.BLACK)){
+            for(int i = 0; i < blackPawns.size();i++){
+                if(blackPawns.get(i).equals(from)){
+                    blackPawns.set(i, to);
+                    break;
+                }
+            }
+            for (Coordinate coordinate : lastTaken)
+                whitePawns.remove(coordinate);
+        }
+
+        System.out.println("Whites");
+        for (Coordinate p: whitePawns)
+            System.out.println(p);
+
+        System.out.println("King" + king);
+
+        System.out.println("Blacks");
+        for(Coordinate p: blackPawns)
+            System.out.println(p);
+
     }
 
     public ArrayList<Action> generateMoves(){
@@ -111,44 +169,44 @@ public class ActiveBoard {
         ArrayList<Action> possible_moves = new ArrayList<>();
         if(getTurn().equals(State.Turn.WHITE)){
             //King
-            int newx, newy;
+            int newr, newc;
             //Move left
-            for(newx = king.x, newy = king.y - 1; newy >= 0; newy --){
-                State.Pawn content = rawBoard[newx][newy];
-                if(isCitadel[newx][newy])
+            for(newr = king.r, newc = king.c - 1; newc >= 0; newc --){
+                State.Pawn content = rawBoard[newr][newc];
+                if(isCitadel[newr][newc])
                     break;
                 if(content.equals(State.Pawn.EMPTY) || content.equals(State.Pawn.THRONE))
-                    possible_moves.add(new Action(king, new Coordinate(newx, newy), getTurn()));
+                    possible_moves.add(new Action(king, new Coordinate(newr, newc), getTurn()));
                 else
                     break;
             }
             //Move right
-            for(newx = king.x, newy = king.y + 1; newy < boardLength; newy ++){
-                State.Pawn content = rawBoard[newx][newy];
-                if(isCitadel[newx][newy])
+            for(newr = king.r, newc = king.c + 1; newc < boardLength; newc ++){
+                State.Pawn content = rawBoard[newr][newc];
+                if(isCitadel[newr][newc])
                     break;
                 if(content.equals(State.Pawn.EMPTY) || content.equals(State.Pawn.THRONE))
-                    possible_moves.add(new Action(king, new Coordinate(newx, newy), getTurn()));
+                    possible_moves.add(new Action(king, new Coordinate(newr, newc), getTurn()));
                 else
                     break;
             }
             //Move up
-            for(newx = king.x - 1, newy = king.y; newx >= 0; newx --){
-                State.Pawn content = rawBoard[newx][newy];
-                if(isCitadel[newx][newy])
+            for(newr = king.r - 1, newc = king.c; newr >= 0; newr --){
+                State.Pawn content = rawBoard[newr][newc];
+                if(isCitadel[newr][newc])
                     break;
                 if(content.equals(State.Pawn.EMPTY) || content.equals(State.Pawn.THRONE))
-                    possible_moves.add(new Action(king, new Coordinate(newx, newy), getTurn()));
+                    possible_moves.add(new Action(king, new Coordinate(newr, newc), getTurn()));
                 else
                     break;
             }
             //Move down
-            for(newx = king.x + 1, newy = king.y; newx < boardLength; newx ++){
-                State.Pawn content = rawBoard[newx][newy];
-                if(isCitadel[newx][newy])
+            for(newr = king.r + 1, newc = king.c; newr < boardLength; newr ++){
+                State.Pawn content = rawBoard[newr][newc];
+                if(isCitadel[newr][newc])
                     break;
                 if(content.equals(State.Pawn.EMPTY) || content.equals(State.Pawn.THRONE))
-                    possible_moves.add(new Action(king, new Coordinate(newx, newy), getTurn()));
+                    possible_moves.add(new Action(king, new Coordinate(newr, newc), getTurn()));
                 else
                     break;
             }
@@ -156,42 +214,42 @@ public class ActiveBoard {
             //Other pawns
             for(Coordinate pawn: whitePawns){
                 //Move left
-                for(newx = pawn.x, newy = pawn.y - 1; newy >=0 ; newy--){
-                    State.Pawn content = rawBoard[newx][newy];
-                    if(isCitadel[newx][newy])
+                for(newr = pawn.r, newc = pawn.c - 1; newc >=0 ; newc--){
+                    State.Pawn content = rawBoard[newr][newc];
+                    if(isCitadel[newr][newc])
                         break;
                     if(content.equals(State.Pawn.EMPTY))
-                        possible_moves.add(new Action(pawn, new Coordinate(newx, newy), getTurn()));
+                        possible_moves.add(new Action(pawn, new Coordinate(newr, newc), getTurn()));
                     else
                         break;
                 }
                 //Move right
-                for(newx = pawn.x, newy = pawn.y + 1; newy < boardLength ; newy++){
-                    State.Pawn content = rawBoard[newx][newy];
-                    if(isCitadel[newx][newy])
+                for(newr = pawn.r, newc = pawn.c + 1; newc < boardLength ; newc++){
+                    State.Pawn content = rawBoard[newr][newc];
+                    if(isCitadel[newr][newc])
                         break;
                     if(content.equals(State.Pawn.EMPTY))
-                        possible_moves.add(new Action(pawn, new Coordinate(newx, newy), getTurn()));
+                        possible_moves.add(new Action(pawn, new Coordinate(newr, newc), getTurn()));
                     else
                         break;
                 }
                 //Move up
-                for(newx = pawn.x - 1, newy = pawn.y; newx >=0 ; newx--){
-                    State.Pawn content = rawBoard[newx][newy];
-                    if(isCitadel[newx][newy])
+                for(newr = pawn.r - 1, newc = pawn.c; newr >=0 ; newr--){
+                    State.Pawn content = rawBoard[newr][newc];
+                    if(isCitadel[newr][newc])
                         break;
                     if(content.equals(State.Pawn.EMPTY))
-                        possible_moves.add(new Action(pawn, new Coordinate(newx, newy), getTurn()));
+                        possible_moves.add(new Action(pawn, new Coordinate(newr, newc), getTurn()));
                     else
                         break;
                 }
                 //Move down
-                for(newx = pawn.x + 1, newy = pawn.y; newx < boardLength ; newx++){
-                    State.Pawn content = rawBoard[newx][newy];
-                    if(isCitadel[newx][newy])
+                for(newr = pawn.r + 1, newc = pawn.c; newr < boardLength ; newr++){
+                    State.Pawn content = rawBoard[newr][newc];
+                    if(isCitadel[newr][newc])
                         break;
                     if(content.equals(State.Pawn.EMPTY))
-                        possible_moves.add(new Action(pawn, new Coordinate(newx, newy), getTurn()));
+                        possible_moves.add(new Action(pawn, new Coordinate(newr, newc), getTurn()));
                     else
                         break;
                 }
@@ -199,44 +257,44 @@ public class ActiveBoard {
         }
         else if(getTurn().equals(State.Turn.BLACK)){
             for(Coordinate pawn: blackPawns){
-                int newx = 0, newy;
+                int newr = 0, newc;
                 //Move left
-                for(newx = pawn.x, newy = pawn.y - 1; newy >= 0; newy --){
-                    State.Pawn content = rawBoard[newx][newy];
-                    if(!isCitadel[pawn.x][pawn.y] && isCitadel[newx][newy] )
+                for(newr = pawn.r, newc = pawn.c - 1; newc >= 0; newc --){
+                    State.Pawn content = rawBoard[newr][newc];
+                    if(!isCitadel[pawn.r][pawn.c] && isCitadel[newr][newc] )
                         break;
                     if(content.equals(State.Pawn.EMPTY))
-                        possible_moves.add(new Action(pawn, new Coordinate(newx, newy), getTurn()));
+                        possible_moves.add(new Action(pawn, new Coordinate(newr, newc), getTurn()));
                     else
                         break;
                 }
                 //Move right
-                for(newx = pawn.x, newy = pawn.y + 1; newy < boardLength; newy++){
-                    State.Pawn content = rawBoard[newx][newy];
-                    if(!isCitadel[pawn.x][pawn.y] && isCitadel[newx][newy] )
+                for(newr = pawn.r, newc = pawn.c + 1; newc < boardLength; newc++){
+                    State.Pawn content = rawBoard[newr][newc];
+                    if(!isCitadel[pawn.r][pawn.c] && isCitadel[newr][newc] )
                         break;
                     if(content.equals(State.Pawn.EMPTY))
-                        possible_moves.add(new Action(pawn, new Coordinate(newx, newy), getTurn()));
+                        possible_moves.add(new Action(pawn, new Coordinate(newr, newc), getTurn()));
                     else
                         break;
                 }
                 //Move up
-                for(newx = pawn.x - 1, newy = pawn.y; newx >= 0; newx --){
-                    State.Pawn content = rawBoard[newx][newy];
-                    if(!isCitadel[pawn.x][pawn.y] && isCitadel[newx][newy] )
+                for(newr = pawn.r - 1, newc = pawn.c; newr >= 0; newr --){
+                    State.Pawn content = rawBoard[newr][newc];
+                    if(!isCitadel[pawn.r][pawn.c] && isCitadel[newr][newc] )
                         break;
                     if(content.equals(State.Pawn.EMPTY))
-                        possible_moves.add(new Action(pawn, new Coordinate(newx, newy), getTurn()));
+                        possible_moves.add(new Action(pawn, new Coordinate(newr, newc), getTurn()));
                     else
                         break;
                 }
                 //Move down
-                for(newx = pawn.x + 1, newy = pawn.y; newx < boardLength; newx ++){
-                    State.Pawn content = rawBoard[newx][newy];
-                    if(!isCitadel[pawn.x][pawn.y] && isCitadel[newx][newy] )
+                for(newr = pawn.r + 1, newc = pawn.c; newr < boardLength; newr ++){
+                    State.Pawn content = rawBoard[newr][newc];
+                    if(!isCitadel[pawn.r][pawn.c] && isCitadel[newr][newc] )
                         break;
                     if(content.equals(State.Pawn.EMPTY))
-                        possible_moves.add(new Action(pawn, new Coordinate(newx, newy), getTurn()));
+                        possible_moves.add(new Action(pawn, new Coordinate(newr, newc), getTurn()));
                     else
                         break;
                 }
@@ -246,6 +304,289 @@ public class ActiveBoard {
             System.out.println("Why are you generating moves for an end state?");
         }
         return possible_moves;
+    }
+
+    private void checkCaptureBlack(Action a){
+        int colTo = a.getColumnTo();
+        int rowTo = a.getRowTo();
+        // mangio a destra
+        if (colTo < gameState.getBoard().length - 2
+                && gameState.getPawn(rowTo, colTo + 1).equalsPawn("W")) {
+            if (gameState.getPawn(rowTo, colTo + 2).equalsPawn("B")) {
+                gameState.removePawn(rowTo, colTo + 1);
+                lastTaken.add(new Coordinate(rowTo, colTo + 1));
+            }
+            if (gameState.getPawn(rowTo, colTo + 2).equalsPawn("T")) {
+                gameState.removePawn(rowTo, colTo + 1);
+                lastTaken.add(new Coordinate(rowTo, colTo + 1));
+            }
+            if (isCitadel[rowTo][colTo + 2]) {
+                gameState.removePawn(rowTo, colTo + 1);
+                lastTaken.add(new Coordinate(rowTo, colTo + 1));
+            }
+            if (gameState.getBox(rowTo, colTo + 2).equals("e5")) {
+                gameState.removePawn(rowTo, colTo + 1);
+                lastTaken.add(new Coordinate(rowTo, colTo + 1));
+            }
+
+        }
+        // mangio a sinistra
+        if (colTo > 1 && gameState.getPawn(rowTo, colTo - 1).equalsPawn("W")
+                && (gameState.getPawn(rowTo, colTo - 2).equalsPawn("B")
+                || gameState.getPawn(rowTo, colTo - 2).equalsPawn("T")
+                || isCitadel[rowTo][colTo - 2]
+                || (gameState.getBox(rowTo, colTo - 2).equals("e5")))) {
+            gameState.removePawn(rowTo, colTo - 1);
+            lastTaken.add(new Coordinate(rowTo, colTo - 1));
+        }
+
+        // mangio sopra
+        if (rowTo > 1 && gameState.getPawn(rowTo - 1, colTo).equalsPawn("W")
+                && (gameState.getPawn(rowTo - 2, colTo).equalsPawn("B")
+                || gameState.getPawn(rowTo - 2, colTo).equalsPawn("T")
+                || isCitadel[rowTo - 2][ colTo]
+                || (gameState.getBox(rowTo - 2, colTo).equals("e5")))) {
+            gameState.removePawn(rowTo - 1, colTo);
+            lastTaken.add(new Coordinate(rowTo-1, colTo));
+        }
+
+        //mangio sotto
+        if (rowTo < gameState.getBoard().length - 2
+                && gameState.getPawn(rowTo + 1, colTo).equalsPawn("W")
+                && (gameState.getPawn(rowTo + 2, colTo).equalsPawn("B")
+                || gameState.getPawn(rowTo + 2, colTo).equalsPawn("T")
+                || isCitadel[rowTo + 2] [colTo]
+                || (gameState.getBox(rowTo + 2, colTo).equals("e5")))) {
+            gameState.removePawn(rowTo + 1, colTo);
+            lastTaken.add(new Coordinate(rowTo+1, colTo));
+        }
+
+
+    }
+
+    // This is fun
+    private void checkCaptureBlackKing(Action a){
+        int colTo = a.getColumnTo();
+        int rowTo = a.getRowTo();
+        // ho il re sulla sinistra
+        if (colTo > 1 && gameState.getPawn(rowTo, colTo - 1).equalsPawn("K")) {
+            // re sul trono
+            if (gameState.getBox(rowTo, colTo - 1).equals("e5")) {
+                if (gameState.getPawn(3, 4).equalsPawn("B") && gameState.getPawn(4, 3).equalsPawn("B")
+                        && gameState.getPawn(5, 4).equalsPawn("B")) {
+                    gameState.setTurn(State.Turn.BLACKWIN);
+                }
+            }
+            // re adiacente al trono
+            if (gameState.getBox(rowTo, colTo - 1).equals("e4")) {
+                if (gameState.getPawn(2, 4).equalsPawn("B") && gameState.getPawn(3, 3).equalsPawn("B")) {
+                    gameState.setTurn(State.Turn.BLACKWIN);
+                }
+            }
+            if (gameState.getBox(rowTo, colTo - 1).equals("f5")) {
+                if (gameState.getPawn(5, 5).equalsPawn("B") && gameState.getPawn(3, 5).equalsPawn("B")) {
+                    gameState.setTurn(State.Turn.BLACKWIN);
+                }
+            }
+            if (gameState.getBox(rowTo, colTo - 1).equals("e6")) {
+                if (gameState.getPawn(6, 4).equalsPawn("B") && gameState.getPawn(5, 3).equalsPawn("B")) {
+                    gameState.setTurn(State.Turn.BLACKWIN);
+                }
+            }
+            // sono fuori dalle zone del trono
+            if (!gameState.getBox(rowTo, colTo - 1).equals("e5")
+                    && !gameState.getBox(rowTo, colTo - 1).equals("e6")
+                    && !gameState.getBox(rowTo, colTo - 1).equals("e4")
+                    && !gameState.getBox(rowTo, colTo - 1).equals("f5")) {
+                if (gameState.getPawn(rowTo, colTo - 2).equalsPawn("B")
+                        || isCitadel[rowTo][colTo - 2]) {
+                    gameState.setTurn(State.Turn.BLACKWIN);
+                }
+            }
+        }
+
+        // ho il re sulla destra
+        if (colTo < gameState.getBoard().length - 2
+                && (gameState.getPawn(rowTo, colTo + 1).equalsPawn("K"))) {
+            // re sul trono
+            if (gameState.getBox(rowTo, colTo + 1).equals("e5")) {
+                if (gameState.getPawn(3, 4).equalsPawn("B") && gameState.getPawn(4, 5).equalsPawn("B")
+                        && gameState.getPawn(5, 4).equalsPawn("B")) {
+                    gameState.setTurn(State.Turn.BLACKWIN);
+                }
+            }
+            // re adiacente al trono
+            if (gameState.getBox(rowTo, colTo + 1).equals("e4")) {
+                if (gameState.getPawn(2, 4).equalsPawn("B") && gameState.getPawn(3, 5).equalsPawn("B")) {
+                    gameState.setTurn(State.Turn.BLACKWIN);
+                }
+            }
+            if (gameState.getBox(rowTo, colTo + 1).equals("e6")) {
+                if (gameState.getPawn(5, 5).equalsPawn("B") && gameState.getPawn(6, 4).equalsPawn("B")) {
+                    gameState.setTurn(State.Turn.BLACKWIN);
+                }
+            }
+            if (gameState.getBox(rowTo, colTo + 1).equals("d5")) {
+                if (gameState.getPawn(3, 3).equalsPawn("B") && gameState.getPawn(5, 3).equalsPawn("B")) {
+                    gameState.setTurn(State.Turn.BLACKWIN);
+                }
+            }
+            // sono fuori dalle zone del trono
+            if (!gameState.getBox(rowTo, colTo + 1).equals("d5")
+                    && !gameState.getBox(rowTo, colTo + 1).equals("e6")
+                    && !gameState.getBox(rowTo, colTo + 1).equals("e4")
+                    && !gameState.getBox(rowTo, colTo + 1).equals("e5")) {
+                if (gameState.getPawn(rowTo, colTo + 2).equalsPawn("B")
+                        || isCitadel[rowTo][colTo + 2]) {
+                    gameState.setTurn(State.Turn.BLACKWIN);
+                }
+            }
+        }
+
+        // ho il re sotto
+        if (rowTo < gameState.getBoard().length - 2
+                && gameState.getPawn(rowTo + 1, a.getColumnTo()).equalsPawn("K")) {
+            System.out.println("Ho il re sotto");
+            // re sul trono
+            if (gameState.getBox(rowTo + 1, colTo).equals("e5")) {
+                if (gameState.getPawn(5, 4).equalsPawn("B") && gameState.getPawn(4, 5).equalsPawn("B")
+                        && gameState.getPawn(4, 3).equalsPawn("B")) {
+                    gameState.setTurn(State.Turn.BLACKWIN);
+                }
+            }
+            // re adiacente al trono
+            if (gameState.getBox(rowTo + 1, colTo).equals("e4")) {
+                if (gameState.getPawn(3, 3).equalsPawn("B") && gameState.getPawn(3, 5).equalsPawn("B")) {
+                    gameState.setTurn(State.Turn.BLACKWIN);
+                }
+            }
+            if (gameState.getBox(rowTo + 1, colTo).equals("d5")) {
+                if (gameState.getPawn(4, 2).equalsPawn("B") && gameState.getPawn(5, 3).equalsPawn("B")) {
+                    gameState.setTurn(State.Turn.BLACKWIN);
+                }
+            }
+            if (gameState.getBox(rowTo + 1, colTo).equals("f5")) {
+                if (gameState.getPawn(4, 6).equalsPawn("B") && gameState.getPawn(5, 5).equalsPawn("B")) {
+                    gameState.setTurn(State.Turn.BLACKWIN);
+                }
+            }
+            // sono fuori dalle zone del trono
+            if (!gameState.getBox(rowTo + 1, colTo).equals("d5")
+                    && !gameState.getBox(rowTo + 1, colTo).equals("e4")
+                    && !gameState.getBox(rowTo + 1, colTo).equals("f5")
+                    && !gameState.getBox(rowTo + 1, colTo).equals("e5")) {
+                if (gameState.getPawn(rowTo + 2, colTo).equalsPawn("B")
+                        || isCitadel[rowTo + 2][colTo]) {
+                    gameState.setTurn(State.Turn.BLACKWIN);
+                }
+            }
+        }
+
+        // ho il re sopra
+        if (rowTo > 1 && gameState.getPawn(rowTo - 1, a.getColumnTo()).equalsPawn("K")) {
+            // re sul trono
+            if (gameState.getBox(rowTo - 1, colTo).equals("e5")) {
+                if (gameState.getPawn(3, 4).equalsPawn("B") && gameState.getPawn(4, 5).equalsPawn("B")
+                        && gameState.getPawn(4, 3).equalsPawn("B")) {
+                    gameState.setTurn(State.Turn.BLACKWIN);
+                }
+            }
+            // re adiacente al trono
+            if (gameState.getBox(rowTo - 1, colTo).equals("e6")) {
+                if (gameState.getPawn(5, 3).equalsPawn("B") && gameState.getPawn(5, 5).equalsPawn("B")) {
+                    gameState.setTurn(State.Turn.BLACKWIN);
+                }
+            }
+            if (gameState.getBox(rowTo - 1, colTo).equals("d5")) {
+                if (gameState.getPawn(4, 2).equalsPawn("B") && gameState.getPawn(3, 3).equalsPawn("B")) {
+                    gameState.setTurn(State.Turn.BLACKWIN);
+                }
+            }
+            if (gameState.getBox(rowTo - 1, colTo).equals("f5")) {
+                if (gameState.getPawn(4, 6).equalsPawn("B") && gameState.getPawn(3, 5).equalsPawn("B")) {
+                    gameState.setTurn(State.Turn.BLACKWIN);
+                }
+            }
+            // sono fuori dalle zone del trono
+            if (!gameState.getBox(rowTo - 1, colTo).equals("d5")
+                    && !gameState.getBox(rowTo - 1, colTo).equals("e4")
+                    && !gameState.getBox(rowTo - 1, colTo).equals("f5")
+                    && !gameState.getBox(rowTo - 1, colTo).equals("e5")) {
+                if (gameState.getPawn(rowTo - 2, colTo).equalsPawn("B")
+                        || isCitadel[rowTo - 2][colTo]) {
+                    gameState.setTurn(State.Turn.BLACKWIN);
+                }
+            }
+        }
+    }
+    private void checkCaptureWhite(Action a){
+        int colTo = a.getColumnTo();
+        int rowTo = a.getRowTo();
+        // controllo se mangio a destra
+        if (colTo < gameState.getBoard().length - 2
+                && gameState.getPawn(rowTo, colTo + 1).equalsPawn("B")
+                && (gameState.getPawn(rowTo, colTo + 2).equalsPawn("W")
+                || gameState.getPawn(rowTo, colTo + 2).equalsPawn("T")
+                || gameState.getPawn(rowTo, colTo + 2).equalsPawn("K")
+                || (isCitadel[rowTo][colTo + 2]
+                && !(colTo + 2 == 8 && rowTo == 4)
+                && !(colTo + 2 == 4 && rowTo == 0)
+                && !(colTo + 2 == 4 && rowTo == 8)
+                && !(colTo + 2 == 0 && rowTo == 4)))) {
+            gameState.removePawn(rowTo, colTo + 1);
+            lastTaken.add(new Coordinate(rowTo, colTo + 1));
+        }
+        // controllo se mangio a sinistra
+        if (colTo > 1 && gameState.getPawn(rowTo, colTo - 1).equalsPawn("B")
+                && (gameState.getPawn(rowTo, colTo - 2).equalsPawn("W")
+                || gameState.getPawn(rowTo, colTo - 2).equalsPawn("T")
+                || gameState.getPawn(rowTo, colTo - 2).equalsPawn("K")
+                || (isCitadel[rowTo][colTo - 2]
+                && !(colTo - 2 == 8 && rowTo == 4)
+                && !(colTo - 2 == 4 && rowTo == 0)
+                && !(colTo - 2 == 4 && rowTo == 8)
+                && !(colTo - 2 == 0 && rowTo == 4)))) {
+            gameState.removePawn(rowTo, colTo - 1);
+            lastTaken.add(new Coordinate(rowTo, colTo - 1));
+
+        }
+        // controllo se mangio sopra
+        if (rowTo > 1 && gameState.getPawn(rowTo - 1, colTo).equalsPawn("B")
+                && (gameState.getPawn(rowTo - 2, colTo).equalsPawn("W")
+                || gameState.getPawn(rowTo - 2, colTo).equalsPawn("T")
+                || gameState.getPawn(rowTo - 2, colTo).equalsPawn("K")
+                || (isCitadel[rowTo - 2][colTo]
+                && !(colTo == 8 && rowTo - 2 == 4)
+                && !(colTo == 4 && rowTo - 2 == 0)
+                && !(colTo == 4 && rowTo - 2 == 8)
+                && !(colTo == 0 && rowTo - 2 == 4)))) {
+            gameState.removePawn(rowTo - 1, colTo);
+            lastTaken.add(new Coordinate(rowTo - 1, colTo));
+
+        }
+        // controllo se mangio sotto
+        if (rowTo < gameState.getBoard().length - 2
+                && gameState.getPawn(rowTo + 1, colTo).equalsPawn("B")
+                && (gameState.getPawn(rowTo + 2, colTo).equalsPawn("W")
+                || gameState.getPawn(rowTo + 2, colTo).equalsPawn("T")
+                || gameState.getPawn(rowTo + 2, colTo).equalsPawn("K")
+                || (isCitadel[rowTo + 2][colTo]
+                && !(colTo == 8 && rowTo + 2 == 4)
+                && !(colTo == 4 && rowTo + 2 == 0)
+                && !(colTo == 4 && rowTo + 2 == 8)
+                && !(colTo == 0 && rowTo + 2 == 4)))) {
+            gameState.removePawn(rowTo + 1, colTo);
+            lastTaken.add(new Coordinate(rowTo + 1, colTo));
+
+        }
+        // controllo se ho vinto
+        if (rowTo == 0 || rowTo == gameState.getBoard().length - 1 || colTo == 0
+                || colTo == gameState.getBoard().length - 1) {
+            if (gameState.getPawn(rowTo, colTo).equalsPawn("K")) {
+                gameState.setTurn(State.Turn.WHITEWIN);
+            }
+        }
+
     }
 
     public void switchTurn(){
@@ -271,13 +612,15 @@ public class ActiveBoard {
 
     /*
     Function used to re compute the location of pieces by scanning the whole board
+    TODO: improve it by not scanning every square but just by scanning the squares which were different from last time
+    Not a very necessary improvement btw
      */
     private void updatePieceLocations(){
         whitePawns.clear();
         blackPawns.clear();
         king = null;
 
-        // Beware, x is vertical axis and y is horizontal axis
+        // Beware, row is vertical axis and column is horizontal axis
         State.Pawn[][] pawns = gameState.getBoard();
         for(int i = 0; i < pawns.length; i++){
             for(int j = 0; j < pawns.length; j++){

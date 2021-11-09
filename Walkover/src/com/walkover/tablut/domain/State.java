@@ -196,6 +196,10 @@ public abstract class State {
 		return ret;
 	}
 
+	public void setPawn(int row, int column, Pawn pawn){
+		board[row][column] = pawn;
+	}
+
 	public State clone() {
 		Class<? extends State> stateclass = this.getClass();
 		Constructor<? extends State> cons = null;

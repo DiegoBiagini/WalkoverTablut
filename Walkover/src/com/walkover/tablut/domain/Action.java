@@ -92,11 +92,11 @@ public class Action implements Serializable {
 	}
 
 	public void toCoordinate(Coordinate f, Coordinate t){
-		f.x = from.charAt(1) - 49;
-		f.y = from.charAt(0) -97;
+		f.r = from.charAt(1) - 49;
+		f.c = from.charAt(0) -97;
 
-		t.x = to.charAt(1) - 49;
-		t.y = to.charAt(0) -97;
+		t.r = to.charAt(1) - 49;
+		t.c = to.charAt(0) -97;
 	}
 
 }
