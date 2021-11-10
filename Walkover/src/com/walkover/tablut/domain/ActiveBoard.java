@@ -633,4 +633,16 @@ public class ActiveBoard {
             }
         }
     }
+
+    public ArrayList<Coordinate> getWhitePawns(){
+        return whitePawns;
+    }
+
+    public ArrayList<Coordinate> getBlackPawns(){
+        return blackPawns;
+    }
+
+    public Coordinate getKing(){
+        return king;
+    }
 }
