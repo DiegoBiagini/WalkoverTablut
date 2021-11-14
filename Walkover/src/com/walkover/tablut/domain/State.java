@@ -2,6 +2,7 @@ package com.walkover.tablut.domain;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Random;
 
 /**
  * Abstract class for a State of a game We have a representation of the board
@@ -63,6 +64,7 @@ public abstract class State {
 
 	protected Pawn board[][];
 	protected Turn turn;
+	protected long zobristHash;
 
 	public State() {
 		super();
@@ -177,6 +179,8 @@ public abstract class State {
 		}
 		if (this.turn != other.turn)
 			return false;
+		if (this.zobristHash != other.zobristHash)
+			return false;
 		return true;
 	}
 
@@ -197,7 +201,11 @@ public abstract class State {
 	}
 
 	public void setPawn(int row, int column, Pawn pawn){
+		if(board[row][column] != Pawn.EMPTY)
+			zobristHash ^= ZobristTable.getTable()[row][column][board[row][column].ordinal()];
 		board[row][column] = pawn;
+		if(pawn != Pawn.EMPTY)
+			zobristHash ^= ZobristTable.getTable()[row][column][pawn.ordinal()];
 	}
 
 	public State clone() {
@@ -223,6 +231,7 @@ public abstract class State {
 
 		result.setBoard(newboard);
 		result.setTurn(this.turn);
+		result.zobristHash = zobristHash;
 		return result;
 	}
 
@@ -242,4 +251,20 @@ public abstract class State {
 		return count;
 	}
 
+	public long getZobristHash(){
+		return zobristHash;
+	}
+
+	protected void recomputeHash(){
+		zobristHash = 0;
+		for (int i = 0; i < board.length; i++) {
+			for (int j = 0; j < board[i].length; j++) {
+				Pawn p = board[i][j];
+				if (board[i][j] != Pawn.EMPTY)
+					zobristHash ^= ZobristTable.getTable()[i][j][p.ordinal()];
+			}
+		}
+	}
 }
+
+

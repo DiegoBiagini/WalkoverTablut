@@ -56,6 +56,8 @@ public class StateTablut extends State implements Serializable {
 		this.board[5][8] = Pawn.BLACK;
 		this.board[4][7] = Pawn.BLACK;
 
+		recomputeHash();
+
 	}
 
 	public StateTablut clone() {
