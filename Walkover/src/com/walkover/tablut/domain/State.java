@@ -143,6 +143,7 @@ public abstract class State {
 
 	public void setBoard(Pawn[][] board) {
 		this.board = board;
+		recomputeHash();
 	}
 
 	public Turn getTurn() {

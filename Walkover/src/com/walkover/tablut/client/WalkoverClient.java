@@ -1,6 +1,9 @@
 package com.walkover.tablut.client;
 
 import com.walkover.tablut.domain.*;
+import com.walkover.tablut.exceptions.ActionException;
+import com.walkover.tablut.exceptions.SearchException;
+import com.walkover.tablut.search.WalkoverSearch;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -100,8 +103,8 @@ public class WalkoverClient extends TablutClient{
                 System.exit(0);
             }
             else if (currentTurn.equals(getPlayer())) {
-                Action chosenMove =  simpleRandomBehaviour(board);
-                System.out.println("Mossa scelta: " + chosenMove.toString());
+                Action chosenMove =  walkoverBehaviour(board, 500);
+                System.out.println("Chosen move: " + chosenMove.toString());
                 try {
                     this.write(chosenMove);
                 } catch (ClassNotFoundException | IOException e) {
@@ -109,7 +112,7 @@ public class WalkoverClient extends TablutClient{
                 }
             }
             else if ( !currentTurn.equals(getPlayer())) {
-                System.out.println("Waiting for your opponent move... ");
+                System.out.println("Waiting for your opponent's move... ");
             }
         }
     }
@@ -118,5 +121,24 @@ public class WalkoverClient extends TablutClient{
         ArrayList<Action> possibleMoves = board.generateMoves();
         int choice = ThreadLocalRandom.current().nextInt(0, possibleMoves.size());
         return possibleMoves.get(choice);
+    }
+
+    private Action walkoverBehaviour(ActiveBoard board, int timeoutMilli) {
+        WalkoverSearch search = new WalkoverSearch(board);
+        Thread searchThread = new Thread(search);
+        searchThread.start();
+        try {
+            searchThread.join(timeoutMilli);
+            searchThread.interrupt();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        if(search.getResult() == null) {
+            System.out.println("Search was halted before reaching a solution");
+            return simpleRandomBehaviour(board);
+        }
+        else
+            return search.getResult();
     }
 }

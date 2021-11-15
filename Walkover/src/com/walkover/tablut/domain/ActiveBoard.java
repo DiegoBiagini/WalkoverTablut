@@ -27,7 +27,7 @@ public class ActiveBoard {
         this.lastMove = null;
         this.lastTaken = new ArrayList<Coordinate>();
 
-        isCitadel = new boolean[9][9];
+        isCitadel = new boolean[gameState.getBoard().length][gameState.getBoard()[0].length];
         for(int i = 0; i < isCitadel.length; i++){
             for(int j = 0; j < isCitadel.length; j++){
                 if(((i == 0 || i == 8) && (j <= 5 && j >= 3))||
@@ -44,6 +44,13 @@ public class ActiveBoard {
         blackPawns = new ArrayList<Coordinate>();
         updatePieceLocations();
 
+    }
+    public ActiveBoard(State gameState){
+        this(gameState, null);
+    }
+
+    public ActiveBoard(){
+        this(new StateTablut());
     }
 
     public boolean performMoveOld(Action move) throws PawnException, DiagonalException, ClimbingException, ActionException, CitadelException, StopException, OccupitedException, BoardException, ClimbingCitadelException, ThroneException {
@@ -166,7 +173,7 @@ public class ActiveBoard {
     public ArrayList<Action> generateMoves(){
         int boardLength = 9;
         State.Pawn[][] rawBoard = gameState.getBoard();
-        ArrayList<Action> possible_moves = new ArrayList<>();
+        ArrayList<Action> possibleMoves = new ArrayList<>();
         if(getTurn().equals(State.Turn.WHITE)){
             //King
             int newr, newc;
@@ -176,7 +183,7 @@ public class ActiveBoard {
                 if(isCitadel[newr][newc])
                     break;
                 if(content.equals(State.Pawn.EMPTY) || content.equals(State.Pawn.THRONE))
-                    possible_moves.add(new Action(king, new Coordinate(newr, newc), getTurn()));
+                    possibleMoves.add(new Action(king, new Coordinate(newr, newc), getTurn()));
                 else
                     break;
             }
@@ -186,7 +193,7 @@ public class ActiveBoard {
                 if(isCitadel[newr][newc])
                     break;
                 if(content.equals(State.Pawn.EMPTY) || content.equals(State.Pawn.THRONE))
-                    possible_moves.add(new Action(king, new Coordinate(newr, newc), getTurn()));
+                    possibleMoves.add(new Action(king, new Coordinate(newr, newc), getTurn()));
                 else
                     break;
             }
@@ -196,7 +203,7 @@ public class ActiveBoard {
                 if(isCitadel[newr][newc])
                     break;
                 if(content.equals(State.Pawn.EMPTY) || content.equals(State.Pawn.THRONE))
-                    possible_moves.add(new Action(king, new Coordinate(newr, newc), getTurn()));
+                    possibleMoves.add(new Action(king, new Coordinate(newr, newc), getTurn()));
                 else
                     break;
             }
@@ -206,7 +213,7 @@ public class ActiveBoard {
                 if(isCitadel[newr][newc])
                     break;
                 if(content.equals(State.Pawn.EMPTY) || content.equals(State.Pawn.THRONE))
-                    possible_moves.add(new Action(king, new Coordinate(newr, newc), getTurn()));
+                    possibleMoves.add(new Action(king, new Coordinate(newr, newc), getTurn()));
                 else
                     break;
             }
@@ -219,7 +226,7 @@ public class ActiveBoard {
                     if(isCitadel[newr][newc])
                         break;
                     if(content.equals(State.Pawn.EMPTY))
-                        possible_moves.add(new Action(pawn, new Coordinate(newr, newc), getTurn()));
+                        possibleMoves.add(new Action(pawn, new Coordinate(newr, newc), getTurn()));
                     else
                         break;
                 }
@@ -229,7 +236,7 @@ public class ActiveBoard {
                     if(isCitadel[newr][newc])
                         break;
                     if(content.equals(State.Pawn.EMPTY))
-                        possible_moves.add(new Action(pawn, new Coordinate(newr, newc), getTurn()));
+                        possibleMoves.add(new Action(pawn, new Coordinate(newr, newc), getTurn()));
                     else
                         break;
                 }
@@ -239,7 +246,7 @@ public class ActiveBoard {
                     if(isCitadel[newr][newc])
                         break;
                     if(content.equals(State.Pawn.EMPTY))
-                        possible_moves.add(new Action(pawn, new Coordinate(newr, newc), getTurn()));
+                        possibleMoves.add(new Action(pawn, new Coordinate(newr, newc), getTurn()));
                     else
                         break;
                 }
@@ -249,7 +256,7 @@ public class ActiveBoard {
                     if(isCitadel[newr][newc])
                         break;
                     if(content.equals(State.Pawn.EMPTY))
-                        possible_moves.add(new Action(pawn, new Coordinate(newr, newc), getTurn()));
+                        possibleMoves.add(new Action(pawn, new Coordinate(newr, newc), getTurn()));
                     else
                         break;
                 }
@@ -264,7 +271,7 @@ public class ActiveBoard {
                     if(!isCitadel[pawn.r][pawn.c] && isCitadel[newr][newc] )
                         break;
                     if(content.equals(State.Pawn.EMPTY))
-                        possible_moves.add(new Action(pawn, new Coordinate(newr, newc), getTurn()));
+                        possibleMoves.add(new Action(pawn, new Coordinate(newr, newc), getTurn()));
                     else
                         break;
                 }
@@ -274,7 +281,7 @@ public class ActiveBoard {
                     if(!isCitadel[pawn.r][pawn.c] && isCitadel[newr][newc] )
                         break;
                     if(content.equals(State.Pawn.EMPTY))
-                        possible_moves.add(new Action(pawn, new Coordinate(newr, newc), getTurn()));
+                        possibleMoves.add(new Action(pawn, new Coordinate(newr, newc), getTurn()));
                     else
                         break;
                 }
@@ -284,7 +291,7 @@ public class ActiveBoard {
                     if(!isCitadel[pawn.r][pawn.c] && isCitadel[newr][newc] )
                         break;
                     if(content.equals(State.Pawn.EMPTY))
-                        possible_moves.add(new Action(pawn, new Coordinate(newr, newc), getTurn()));
+                        possibleMoves.add(new Action(pawn, new Coordinate(newr, newc), getTurn()));
                     else
                         break;
                 }
@@ -294,7 +301,7 @@ public class ActiveBoard {
                     if(!isCitadel[pawn.r][pawn.c] && isCitadel[newr][newc] )
                         break;
                     if(content.equals(State.Pawn.EMPTY))
-                        possible_moves.add(new Action(pawn, new Coordinate(newr, newc), getTurn()));
+                        possibleMoves.add(new Action(pawn, new Coordinate(newr, newc), getTurn()));
                     else
                         break;
                 }
@@ -303,7 +310,7 @@ public class ActiveBoard {
         else{
             System.out.println("Why are you generating moves for an end state?");
         }
-        return possible_moves;
+        return possibleMoves;
     }
 
     private void checkCaptureBlack(Action a){

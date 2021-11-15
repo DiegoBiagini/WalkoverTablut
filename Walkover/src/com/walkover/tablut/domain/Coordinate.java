@@ -32,6 +32,10 @@ public class Coordinate {
         return ret;
     }
 
+    public int getManhattanDist(Coordinate c2){
+        return(Math.abs(r-c2.r) + Math.abs(c-c2.c));
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

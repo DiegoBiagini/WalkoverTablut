@@ -17,6 +17,8 @@ public class ZobristTable {
     }
 
     public static long[][][] getTable() {
+        if( zobristTable == null)
+            generateTable();
         return zobristTable;
     }
 }
