@@ -109,7 +109,7 @@ public class ActiveBoard {
     }
 
     // This function does not check for move validity, for speed reasons ofc
-    public void performMove(Action move) throws PawnException, DiagonalException, ClimbingException, ActionException, CitadelException, StopException, OccupitedException, BoardException, ClimbingCitadelException, ThroneException {
+    public void performMove(Action move)  {
         lastTaken.clear();
         State.Turn currentTurn = getTurn();
         Coordinate from = new Coordinate();
@@ -172,6 +172,7 @@ public class ActiveBoard {
 
     public ArrayList<Action> generateMoves(){
         int boardLength = 9;
+        System.out.println("Current turn:" + getTurn());
         State.Pawn[][] rawBoard = gameState.getBoard();
         ArrayList<Action> possibleMoves = new ArrayList<>();
         if(getTurn().equals(State.Turn.WHITE)){
@@ -309,6 +310,32 @@ public class ActiveBoard {
         }
         else{
             System.out.println("Why are you generating moves for an end state?");
+        }
+        for(Action a : possibleMoves){
+            try {
+                rules.checkMove(getGameState(), a);
+            } catch (BoardException e) {
+                e.printStackTrace();
+            } catch (ActionException e) {
+                e.printStackTrace();
+            } catch (StopException e) {
+                e.printStackTrace();
+            } catch (PawnException e) {
+                System.out.println(getTurn());
+                e.printStackTrace();
+            } catch (DiagonalException e) {
+                e.printStackTrace();
+            } catch (ClimbingException e) {
+                e.printStackTrace();
+            } catch (ThroneException e) {
+                e.printStackTrace();
+            } catch (OccupitedException e) {
+                e.printStackTrace();
+            } catch (ClimbingCitadelException e) {
+                e.printStackTrace();
+            } catch (CitadelException e) {
+                e.printStackTrace();
+            }
         }
         return possibleMoves;
     }

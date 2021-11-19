@@ -64,7 +64,6 @@ public class KingDistanceMetric extends Metric{
             kingDistance = goal.g;
         AStarNode res = goal;
         while(goal != null){
-            System.out.println(goal.c);
             goal = goal.parent;
         }
         return kingDistance;

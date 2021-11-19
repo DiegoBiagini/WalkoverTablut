@@ -88,7 +88,7 @@ public class WalkoverClient extends TablutClient{
                 if(getPlayer() == StateTablut.Turn.WHITE)
                     System.out.println("YOU WIN!");
                 else
-                    System.out.println("YOU WIN");
+                    System.out.println("YOU LOSE");
                 System.exit(0);
             }
             else if (state.getTurn().equals(StateTablut.Turn.BLACKWIN)) {
@@ -103,7 +103,7 @@ public class WalkoverClient extends TablutClient{
                 System.exit(0);
             }
             else if (currentTurn.equals(getPlayer())) {
-                Action chosenMove =  walkoverBehaviour(board, 500);
+                Action chosenMove =  simpleRandomBehaviour(board);
                 System.out.println("Chosen move: " + chosenMove.toString());
                 try {
                     this.write(chosenMove);
