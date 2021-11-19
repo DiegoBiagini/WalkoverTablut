@@ -8,12 +8,11 @@ import java.util.ArrayList;
 Class that will handle all possible operations applied to the game state
 Hopefully faster than the default implementation
  */
-public class ActiveBoard {
+public class ActiveBoard{
 
     private State gameState;
     private Action lastMove;
     private ArrayList<Coordinate> lastTaken;
-    private GameAshtonTablut rules;
 
     private ArrayList<Coordinate> whitePawns;
     private ArrayList<Coordinate> blackPawns;
@@ -21,8 +20,7 @@ public class ActiveBoard {
 
     private boolean[][] isCitadel;
 
-    public ActiveBoard(State gameState, GameAshtonTablut rules){
-        this.rules = rules;
+    public ActiveBoard(State gameState){
         this.gameState = gameState;
         this.lastMove = null;
         this.lastTaken = new ArrayList<Coordinate>();
@@ -45,14 +43,23 @@ public class ActiveBoard {
         updatePieceLocations();
 
     }
-    public ActiveBoard(State gameState){
-        this(gameState, null);
-    }
-
     public ActiveBoard(){
         this(new StateTablut());
     }
 
+    public ActiveBoard(ActiveBoard c1){
+        this.gameState = c1.gameState.clone();
+        this.lastMove = c1.lastMove;
+        this.lastTaken = (ArrayList<Coordinate>)c1.lastTaken.clone();
+
+        this.isCitadel = c1.isCitadel.clone();
+
+        this.king = c1.king;
+        this.whitePawns = (ArrayList<Coordinate>)c1.whitePawns.clone();
+        this.blackPawns = (ArrayList<Coordinate>)c1.blackPawns.clone();
+    }
+
+    /*
     public boolean performMoveOld(Action move) throws PawnException, DiagonalException, ClimbingException, ActionException, CitadelException, StopException, OccupitedException, BoardException, ClimbingCitadelException, ThroneException {
         lastTaken.clear();
         State.Turn previousTurn = getTurn();
@@ -108,6 +115,8 @@ public class ActiveBoard {
         return result;
     }
 
+    */
+
     // This function does not check for move validity, for speed reasons ofc
     public void performMove(Action move)  {
         lastTaken.clear();
@@ -158,21 +167,10 @@ public class ActiveBoard {
                 whitePawns.remove(coordinate);
         }
 
-        System.out.println("Whites");
-        for (Coordinate p: whitePawns)
-            System.out.println(p);
-
-        System.out.println("King" + king);
-
-        System.out.println("Blacks");
-        for(Coordinate p: blackPawns)
-            System.out.println(p);
-
     }
 
     public ArrayList<Action> generateMoves(){
         int boardLength = 9;
-        System.out.println("Current turn:" + getTurn());
         State.Pawn[][] rawBoard = gameState.getBoard();
         ArrayList<Action> possibleMoves = new ArrayList<>();
         if(getTurn().equals(State.Turn.WHITE)){
@@ -183,7 +181,7 @@ public class ActiveBoard {
                 State.Pawn content = rawBoard[newr][newc];
                 if(isCitadel[newr][newc])
                     break;
-                if(content.equals(State.Pawn.EMPTY) || content.equals(State.Pawn.THRONE))
+                if(content.equals(State.Pawn.EMPTY))
                     possibleMoves.add(new Action(king, new Coordinate(newr, newc), getTurn()));
                 else
                     break;
@@ -193,7 +191,7 @@ public class ActiveBoard {
                 State.Pawn content = rawBoard[newr][newc];
                 if(isCitadel[newr][newc])
                     break;
-                if(content.equals(State.Pawn.EMPTY) || content.equals(State.Pawn.THRONE))
+                if(content.equals(State.Pawn.EMPTY))
                     possibleMoves.add(new Action(king, new Coordinate(newr, newc), getTurn()));
                 else
                     break;
@@ -203,7 +201,7 @@ public class ActiveBoard {
                 State.Pawn content = rawBoard[newr][newc];
                 if(isCitadel[newr][newc])
                     break;
-                if(content.equals(State.Pawn.EMPTY) || content.equals(State.Pawn.THRONE))
+                if(content.equals(State.Pawn.EMPTY))
                     possibleMoves.add(new Action(king, new Coordinate(newr, newc), getTurn()));
                 else
                     break;
@@ -213,7 +211,7 @@ public class ActiveBoard {
                 State.Pawn content = rawBoard[newr][newc];
                 if(isCitadel[newr][newc])
                     break;
-                if(content.equals(State.Pawn.EMPTY) || content.equals(State.Pawn.THRONE))
+                if(content.equals(State.Pawn.EMPTY))
                     possibleMoves.add(new Action(king, new Coordinate(newr, newc), getTurn()));
                 else
                     break;
@@ -311,32 +309,7 @@ public class ActiveBoard {
         else{
             System.out.println("Why are you generating moves for an end state?");
         }
-        for(Action a : possibleMoves){
-            try {
-                rules.checkMove(getGameState(), a);
-            } catch (BoardException e) {
-                e.printStackTrace();
-            } catch (ActionException e) {
-                e.printStackTrace();
-            } catch (StopException e) {
-                e.printStackTrace();
-            } catch (PawnException e) {
-                System.out.println(getTurn());
-                e.printStackTrace();
-            } catch (DiagonalException e) {
-                e.printStackTrace();
-            } catch (ClimbingException e) {
-                e.printStackTrace();
-            } catch (ThroneException e) {
-                e.printStackTrace();
-            } catch (OccupitedException e) {
-                e.printStackTrace();
-            } catch (ClimbingCitadelException e) {
-                e.printStackTrace();
-            } catch (CitadelException e) {
-                e.printStackTrace();
-            }
-        }
+
         return possibleMoves;
     }
 
@@ -480,7 +453,6 @@ public class ActiveBoard {
         // ho il re sotto
         if (rowTo < gameState.getBoard().length - 2
                 && gameState.getPawn(rowTo + 1, a.getColumnTo()).equalsPawn("K")) {
-            System.out.println("Ho il re sotto");
             // re sul trono
             if (gameState.getBox(rowTo + 1, colTo).equals("e5")) {
                 if (gameState.getPawn(5, 4).equalsPawn("B") && gameState.getPawn(4, 5).equalsPawn("B")
@@ -646,8 +618,6 @@ public class ActiveBoard {
 
     /*
     Function used to re compute the location of pieces by scanning the whole board
-    TODO: improve it by not scanning every square but just by scanning the squares which were different from last time
-    Not a very necessary improvement btw
      */
     private void updatePieceLocations(){
         whitePawns.clear();
@@ -679,4 +649,5 @@ public class ActiveBoard {
     public Coordinate getKing(){
         return king;
     }
+
 }

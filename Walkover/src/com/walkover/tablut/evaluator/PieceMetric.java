@@ -22,7 +22,8 @@ public class PieceMetric extends Metric{
 
         // No white pieces -> -1
         // No black pieces -> 1
-        return ((float)rescaledWhite/(nWhite + nBlack)) - ((float)nBlack/(nWhite + nBlack));
+        float res= ((float)rescaledWhite/(nWhite + nBlack)) - ((float)nBlack/(nWhite + nBlack));
+        return res;
 
     }
 }

@@ -61,11 +61,7 @@ public class WalkoverClient extends TablutClient{
             e.printStackTrace();
         }
 
-        State state = new StateTablut();
-        GameAshtonTablut rules = new GameAshtonTablut(99, 0, "garbage", "fake", "fake");
-        state.setTurn(State.Turn.WHITE);
-
-        ActiveBoard board = new ActiveBoard(state, rules);
+        ActiveBoard board = new ActiveBoard();
 
         System.out.println("You are player " + this.getPlayer().toString() + "!");
 
@@ -84,6 +80,7 @@ public class WalkoverClient extends TablutClient{
 
             State.Turn currentTurn = board.getTurn();
 
+
             if (currentTurn.equals(StateTablut.Turn.WHITEWIN)) {
                 if(getPlayer() == StateTablut.Turn.WHITE)
                     System.out.println("YOU WIN!");
@@ -91,19 +88,19 @@ public class WalkoverClient extends TablutClient{
                     System.out.println("YOU LOSE");
                 System.exit(0);
             }
-            else if (state.getTurn().equals(StateTablut.Turn.BLACKWIN)) {
+            else if (currentTurn.equals(StateTablut.Turn.BLACKWIN)) {
                 if(getPlayer() == StateTablut.Turn.BLACK)
                     System.out.println("YOU LOSE");
                 else
                     System.out.println("YOU WIN!");
                 System.exit(0);
             }
-            else if (state.getTurn().equals(StateTablut.Turn.DRAW)) {
+            else if (currentTurn.equals(StateTablut.Turn.DRAW)) {
                 System.out.println("DRAW!");
                 System.exit(0);
             }
             else if (currentTurn.equals(getPlayer())) {
-                Action chosenMove =  simpleRandomBehaviour(board);
+                Action chosenMove =  walkoverBehaviour(board, 10000);
                 System.out.println("Chosen move: " + chosenMove.toString());
                 try {
                     this.write(chosenMove);

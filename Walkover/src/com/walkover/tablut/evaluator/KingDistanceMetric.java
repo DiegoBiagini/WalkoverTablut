@@ -66,8 +66,7 @@ public class KingDistanceMetric extends Metric{
         while(goal != null){
             goal = goal.parent;
         }
-        return kingDistance;
-        /*
+
         //Now translate the distance in a score
         // For now it's a constant slope with score = 1 at distance 1, score = 0 at distance avgDist, score = -1 at distance 2*avgDist - 1
         int avgDist = 5;
@@ -76,7 +75,6 @@ public class KingDistanceMetric extends Metric{
         if (score < -1)
             score = -1;
         return score;
-        */
     }
 
     private AStarNode aStar(AStarNode start, char[][] board){
