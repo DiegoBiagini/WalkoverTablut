@@ -13,6 +13,7 @@ public class WalkoverSearch implements Runnable {
     private ActiveBoard board;
     private Action actionFound;
     private WalkoverEvaluator eval;
+    private int nodesExplored;
 
     public WalkoverSearch(ActiveBoard board){
         this.board = board;
@@ -21,6 +22,7 @@ public class WalkoverSearch implements Runnable {
     }
 
     public float minimax(TreeNode node, int depth){
+        nodesExplored++;
         if(depth == 0)
             return eval.evaluatePosition(node.state);
         if(node.getMaxPlayer() == State.Turn.WHITE){
@@ -68,10 +70,12 @@ public class WalkoverSearch implements Runnable {
 
     @Override
     public void run(){
+        nodesExplored = 0;
         int depth = 3;
         TreeNode root = new TreeNode(board);
         float result = minimax(root, depth);
         System.out.println(result);
+        System.out.println("Nodes explored "  + nodesExplored);
     }
 
     public Action getResult(){

@@ -2,7 +2,6 @@ package com.walkover.tablut.domain;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Random;
 
 /**
  * Abstract class for a State of a game We have a representation of the board
@@ -138,6 +137,8 @@ public abstract class State {
 	 * 
 	 */
 	public void removePawn(int row, int column) {
+		if(this.board[row][column] != Pawn.EMPTY)
+			zobristHash ^= ZobristTable.getBoardTable()[row][column][board[row][column].ordinal()];
 		this.board[row][column] = Pawn.EMPTY;
 	}
 
@@ -151,7 +152,9 @@ public abstract class State {
 	}
 
 	public void setTurn(Turn turn) {
+		zobristHash ^= ZobristTable.getTurnTable()[this.turn.ordinal()];
 		this.turn = turn;
+		zobristHash ^= ZobristTable.getTurnTable()[this.turn.ordinal()];
 	}
 
 	@Override
@@ -203,10 +206,10 @@ public abstract class State {
 
 	public void setPawn(int row, int column, Pawn pawn){
 		if(board[row][column] != Pawn.EMPTY)
-			zobristHash ^= ZobristTable.getTable()[row][column][board[row][column].ordinal()];
+			zobristHash ^= ZobristTable.getBoardTable()[row][column][board[row][column].ordinal()];
 		board[row][column] = pawn;
 		if(pawn != Pawn.EMPTY)
-			zobristHash ^= ZobristTable.getTable()[row][column][pawn.ordinal()];
+			zobristHash ^= ZobristTable.getBoardTable()[row][column][pawn.ordinal()];
 	}
 
 	public State clone() {
@@ -262,9 +265,10 @@ public abstract class State {
 			for (int j = 0; j < board[i].length; j++) {
 				Pawn p = board[i][j];
 				if (board[i][j] != Pawn.EMPTY)
-					zobristHash ^= ZobristTable.getTable()[i][j][p.ordinal()];
+					zobristHash ^= ZobristTable.getBoardTable()[i][j][p.ordinal()];
 			}
 		}
+		zobristHash ^= ZobristTable.getTurnTable()[turn.ordinal()];
 	}
 }
 

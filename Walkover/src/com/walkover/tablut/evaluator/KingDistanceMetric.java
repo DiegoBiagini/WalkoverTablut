@@ -22,7 +22,7 @@ public class KingDistanceMetric extends Metric{
             {'0','G','G','1','1','1','G','G','0'},
     };
 
-    private final Coordinate[] goalCoord = new Coordinate[]{
+    public final Coordinate[] goalCoord = new Coordinate[]{
             new Coordinate(1,0),
             new Coordinate(2,0),
             new Coordinate(6,0),

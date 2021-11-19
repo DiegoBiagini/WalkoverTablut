@@ -18,6 +18,25 @@ public class ActiveBoard{
     private ArrayList<Coordinate> blackPawns;
     private Coordinate king;
 
+    public final Coordinate[] goalCoord = new Coordinate[]{
+            new Coordinate(1,0),
+            new Coordinate(2,0),
+            new Coordinate(6,0),
+            new Coordinate(7,0),
+            new Coordinate(1,8),
+            new Coordinate(2,8),
+            new Coordinate(6,8),
+            new Coordinate(7,8),
+            new Coordinate(0,1),
+            new Coordinate(0,2),
+            new Coordinate(0,6),
+            new Coordinate(0,7),
+            new Coordinate(8,1),
+            new Coordinate(8,2),
+            new Coordinate(8,6),
+            new Coordinate(8,7),
+    } ;
+
     private boolean[][] isCitadel;
 
     public ActiveBoard(State gameState){
@@ -124,6 +143,8 @@ public class ActiveBoard{
         Coordinate from = new Coordinate();
         Coordinate to = new Coordinate();
 
+        boolean kingMove = from.equals(king);
+
         // MOVE AND CHANGE TURN
         move.toCoordinate(from, to);
         gameState.setPawn(to.r, to.c, gameState.getPawn(from.r, from.c));
@@ -140,6 +161,8 @@ public class ActiveBoard{
             checkCaptureBlackKing(move);
         } else if (getTurn().equalsTurn("B")) {
             checkCaptureWhite(move);
+            if(kingMove)
+                checkWinWhite();
         }
         // UPDATE POSITIONS
         if (currentTurn.equals(State.Turn.WHITE)){
@@ -168,6 +191,14 @@ public class ActiveBoard{
         }
 
     }
+
+    private void checkWinWhite() {
+        for(Coordinate g: goalCoord){
+            if(king.equals(g))
+                gameState.setTurn(State.Turn.WHITEWIN);
+        }
+    }
+
 
     public ArrayList<Action> generateMoves(){
         int boardLength = 9;
