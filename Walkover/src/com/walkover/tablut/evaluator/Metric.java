@@ -120,3 +120,5 @@ public double victoryPaths(Coord king, List<Coord> blackPieces, List<Coord> whit
             return p.getRow() > min && p.getRow() < max;
         }
 //Manhattan distance king to the nearest escaping tile (?)
+        
+int KingDistance = kingCoordinate.getManhattanDist(Coordinate tilecoordinate);    //from coordinate.java
