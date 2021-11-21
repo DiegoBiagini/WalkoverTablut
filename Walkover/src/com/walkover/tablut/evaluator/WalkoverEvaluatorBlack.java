@@ -6,11 +6,10 @@ import com.walkover.tablut.domain.State;
 import java.util.ArrayList;
 
 
-public class WalkoverEvaluatorBlack {
-    private ArrayList<Metric> metrics;
+public class WalkoverEvaluatorBlack extends WalkoverEvaluator{
 
     public WalkoverEvaluatorBlack(){
-        metrics = new ArrayList<Metric>();
+        super();
         //Initialize metrics
         metrics.add(new PieceMetric(20));
 
@@ -21,6 +20,7 @@ public class WalkoverEvaluatorBlack {
 
     }
 
+    @Override
     public void switchBehaviour(){
         metrics = new ArrayList<Metric>();
 
@@ -61,19 +61,5 @@ public class WalkoverEvaluatorBlack {
 
      */
 
-    public float evaluatePosition(ActiveBoard board){
-        if(board.getTurn().equals(State.Turn.WHITEWIN))
-            return Float.POSITIVE_INFINITY;
-        if(board.getTurn().equals(State.Turn.BLACKWIN))
-            return Float.NEGATIVE_INFINITY;
 
-        int totalWeight = 0;
-        float totalScore = 0;
-        for(Metric m : metrics){
-            totalWeight += m.getWeight();
-            totalScore += m.evaluateWWeight(board);
-        }
-        //System.out.println(totalScore/totalWeight);
-        return totalScore/totalWeight;
-    }
 }

@@ -3,6 +3,7 @@ package com.walkover.tablut.search;
 import com.walkover.tablut.domain.Action;
 import com.walkover.tablut.domain.ActiveBoard;
 import com.walkover.tablut.domain.State;
+import com.walkover.tablut.evaluator.WalkoverEvaluator;
 import com.walkover.tablut.evaluator.WalkoverEvaluatorBlack;
 import com.walkover.tablut.evaluator.WalkoverEvaluatorWhite;
 
@@ -14,7 +15,7 @@ public class WalkoverSearch implements Runnable {
     private static int n = 0;
     private ActiveBoard board;
     private Action actionFound;
-    private WalkoverEvaluatorBlack eval;
+    private WalkoverEvaluator eval;
     public int nodesExplored;
     public int depthReached;
     private int curN;
@@ -27,12 +28,12 @@ public class WalkoverSearch implements Runnable {
     private int cutCount;
     private int repeatCount;
 
-    public WalkoverSearch(ActiveBoard board){
+    public WalkoverSearch(ActiveBoard board, WalkoverEvaluator eval){
         n++;
         curN = n;
         this.board = board;
         this.actionFound = null;
-        this.eval = new WalkoverEvaluatorBlack();
+        this.eval = eval;
     }
 
     public float minimax(TreeNode node, int depth, float alpha, float beta){
@@ -134,8 +135,6 @@ public class WalkoverSearch implements Runnable {
                 if(res < best) {
                     best = res;
                     bestAction = c.pAction;
-                    if(bestAction == null)
-                        System.out.println("WTF");
                 }
                 if(best < alpha) { // pruning condition, ALL-NODE
                     node.t = TreeNode.NodeType.ALL;
@@ -231,6 +230,7 @@ public class WalkoverSearch implements Runnable {
     @Override
     public void run(){
         int i;
+        int behaviourSwitchThreshold = 15;
         int maxDepth = 10;
         transpositionTable = new HashMap<Long, TTEntry>();
         previousTT = new HashMap<Long, TTEntry>();
@@ -244,6 +244,7 @@ public class WalkoverSearch implements Runnable {
             nodesExplored = 0;
             TreeNode root = new TreeNode(board);
             float res = minimax(root, i, Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY);
+
             if((res == Float.POSITIVE_INFINITY && board.getTurn() == State.Turn.WHITE) ||
                     (res == Float.NEGATIVE_INFINITY && board.getTurn() == State.Turn.BLACK)) {
                 break;
@@ -255,7 +256,7 @@ public class WalkoverSearch implements Runnable {
             previousTT = transpositionTable;
             transpositionTable = new HashMap<Long, TTEntry>();
 
-            if(curN > 15){
+            if(curN > behaviourSwitchThreshold){
                 eval.switchBehaviour();
             }
 

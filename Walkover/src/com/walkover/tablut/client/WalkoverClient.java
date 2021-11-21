@@ -1,6 +1,9 @@
 package com.walkover.tablut.client;
 
 import com.walkover.tablut.domain.*;
+import com.walkover.tablut.evaluator.WalkoverEvaluator;
+import com.walkover.tablut.evaluator.WalkoverEvaluatorBlack;
+import com.walkover.tablut.evaluator.WalkoverEvaluatorWhite;
 import com.walkover.tablut.exceptions.ActionException;
 import com.walkover.tablut.exceptions.SearchException;
 import com.walkover.tablut.search.WalkoverSearch;
@@ -101,7 +104,7 @@ public class WalkoverClient extends TablutClient{
             }
             else if (currentTurn.equals(getPlayer())) {
                 Action chosenMove;
-                chosenMove =  walkoverBehaviour(board, 10000);
+                chosenMove =  walkoverBehaviour(board, getTimeout() -1);
 
                 System.out.println("Chosen move: " + chosenMove.toString());
                 try {
@@ -122,12 +125,18 @@ public class WalkoverClient extends TablutClient{
         return possibleMoves.get(choice);
     }
 
-    private Action walkoverBehaviour(ActiveBoard board, int timeoutMilli) {
-        WalkoverSearch search = new WalkoverSearch(board);
+    private Action walkoverBehaviour(ActiveBoard board, int timeoutS) {
+        WalkoverEvaluator evaluator;
+        if(board.getTurn() == State.Turn.BLACK)
+            evaluator = new WalkoverEvaluatorBlack();
+        else
+            evaluator = new WalkoverEvaluatorWhite();
+
+        WalkoverSearch search = new WalkoverSearch(board, evaluator);
         Thread searchThread = new Thread(search);
         searchThread.start();
         try {
-            Thread.currentThread().sleep(timeoutMilli);
+            searchThread.join(timeoutS* 1000L);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
