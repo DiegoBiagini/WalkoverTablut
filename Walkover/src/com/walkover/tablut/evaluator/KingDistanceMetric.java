@@ -46,6 +46,7 @@ public class KingDistanceMetric extends Metric{
     }
     @Override
     public float evaluate(ActiveBoard board) {
+        int avgDist = 5;
         // Create a simpler board where 0 is empty, 1 is occupied, G is a goal
         char[][] simpleBoard = baseBoard.clone();
 
@@ -59,7 +60,7 @@ public class KingDistanceMetric extends Metric{
         AStarNode goal = aStar(startNode, simpleBoard);
         int kingDistance = 0;
         if (goal == null)
-            kingDistance = 1000;
+            kingDistance = avgDist;
         else
             kingDistance = goal.g;
         AStarNode res = goal;
@@ -69,12 +70,11 @@ public class KingDistanceMetric extends Metric{
 
         //Now translate the distance in a score
         // For now it's a constant slope with score = 1 at distance 1, score = 0 at distance avgDist, score = -1 at distance 2*avgDist - 1
-        int avgDist = 5;
 
         float score = 1 +(-1 * ((kingDistance - 1)/((float)avgDist - 1)));
         if (score < -1)
             score = -1;
-        return score;
+        return -kingDistance;
     }
 
     private AStarNode aStar(AStarNode start, char[][] board){
@@ -175,13 +175,13 @@ public class KingDistanceMetric extends Metric{
     }
 
     private int eval(Coordinate c, char[][] board){
-        int minDist = 1000;
+        float minDist = Float.POSITIVE_INFINITY;
         for(Coordinate g: goalCoord){
             int dist = c.getManhattanDist(g);
             if(dist < minDist)
                 minDist = dist;
         }
-        return minDist;
+        return (int)minDist;
     }
 
     class AStarNode {

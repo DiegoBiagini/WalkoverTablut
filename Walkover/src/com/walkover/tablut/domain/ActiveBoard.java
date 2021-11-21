@@ -67,7 +67,17 @@ public class ActiveBoard{
     }
 
     public ActiveBoard(ActiveBoard c1){
-        this.gameState = c1.gameState.clone();
+        this.gameState = new StateTablut(true);
+        for(Coordinate c: c1.getWhitePawns()){
+            gameState.setPawn(c.r, c.c, State.Pawn.WHITE);
+        }
+        for(Coordinate c: c1.getBlackPawns()){
+            gameState.setPawn(c.r, c.c, State.Pawn.BLACK);
+        }
+        this.gameState.setPawn(c1.king.r, c1.king.c, State.Pawn.KING);
+        this.gameState.setZobristHash(c1.getGameState().getZobristHash());
+        this.gameState.setTurn(c1.getTurn());
+
         this.lastMove = c1.lastMove;
         this.lastTaken = (ArrayList<Coordinate>)c1.lastTaken.clone();
 

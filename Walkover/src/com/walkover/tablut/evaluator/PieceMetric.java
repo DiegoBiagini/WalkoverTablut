@@ -19,16 +19,12 @@ public class PieceMetric extends Metric{
         int nBlack = board.getBlackPawns().size();
 
         int rescaledWhite = nWhite * totalBlack/totalWhite;
-
-        // No white pieces -> -1
-        // No black pieces -> 1
-        float res= ((float)rescaledWhite/(nWhite + nBlack)) - ((float)nBlack/(nWhite + nBlack));
-        return res;
-
+        return ((float)rescaledWhite) - ((float)nBlack);
     }
 }
 
 ///////
+/*
 
 public class PieceMetric extends Metric{
     private final int totalWhite = 8;
@@ -109,3 +105,4 @@ public static List<Coordinate> getNeighbors(Coordinate c) {
     public Pawn getPawnAt(Coordinate c) {
         return board[c.x][c.y];
     }
+*/

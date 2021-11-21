@@ -90,9 +90,9 @@ public class WalkoverClient extends TablutClient{
             }
             else if (currentTurn.equals(StateTablut.Turn.BLACKWIN)) {
                 if(getPlayer() == StateTablut.Turn.BLACK)
-                    System.out.println("YOU LOSE");
+                    System.out.println("YOU WIN");
                 else
-                    System.out.println("YOU WIN!");
+                    System.out.println("YOU LOSE!");
                 System.exit(0);
             }
             else if (currentTurn.equals(StateTablut.Turn.DRAW)) {
@@ -100,7 +100,9 @@ public class WalkoverClient extends TablutClient{
                 System.exit(0);
             }
             else if (currentTurn.equals(getPlayer())) {
-                Action chosenMove =  walkoverBehaviour(board, 10000);
+                Action chosenMove;
+                chosenMove =  walkoverBehaviour(board, 10000);
+
                 System.out.println("Chosen move: " + chosenMove.toString());
                 try {
                     this.write(chosenMove);
@@ -125,11 +127,14 @@ public class WalkoverClient extends TablutClient{
         Thread searchThread = new Thread(search);
         searchThread.start();
         try {
-            searchThread.join(timeoutMilli);
-            searchThread.interrupt();
+            Thread.currentThread().sleep(timeoutMilli);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        searchThread.interrupt();
+        System.out.println(search.getResult());
+        System.out.println("Nodes explored "  + search.nodesExplored);
+        System.out.println("Depth reached:" + search.depthReached);
 
         if(search.getResult() == null) {
             System.out.println("Search was halted before reaching a solution");

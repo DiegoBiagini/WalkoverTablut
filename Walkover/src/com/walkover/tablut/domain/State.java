@@ -152,7 +152,8 @@ public abstract class State {
 	}
 
 	public void setTurn(Turn turn) {
-		zobristHash ^= ZobristTable.getTurnTable()[this.turn.ordinal()];
+		if(this.turn != null)
+			zobristHash ^= ZobristTable.getTurnTable()[this.turn.ordinal()];
 		this.turn = turn;
 		zobristHash ^= ZobristTable.getTurnTable()[this.turn.ordinal()];
 	}
@@ -257,6 +258,10 @@ public abstract class State {
 
 	public long getZobristHash(){
 		return zobristHash;
+	}
+
+	public void setZobristHash(long zobristHash){
+		this.zobristHash = zobristHash;
 	}
 
 	protected void recomputeHash(){

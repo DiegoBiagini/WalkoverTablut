@@ -14,6 +14,18 @@ public class StateTablut extends State implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	public StateTablut(boolean anyway){
+		super();
+		this.board = new Pawn[9][9];
+
+		for (int i = 0; i < 9; i++) {
+			for (int j = 0; j < 9; j++) {
+				this.board[i][j] = Pawn.EMPTY;
+			}
+		}
+		this.board[4][4] = Pawn.THRONE;
+	}
+
 	public StateTablut() {
 		super();
 		this.board = new Pawn[9][9];
@@ -26,7 +38,7 @@ public class StateTablut extends State implements Serializable {
 
 		this.board[4][4] = Pawn.THRONE;
 
-		this.turn = Turn.BLACK;
+		this.turn = Turn.WHITE;
 
 		this.board[4][4] = Pawn.KING;
 
