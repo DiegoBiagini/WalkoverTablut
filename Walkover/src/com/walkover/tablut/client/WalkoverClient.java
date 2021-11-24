@@ -43,11 +43,12 @@ public class WalkoverClient extends TablutClient{
             System.out.println(args[0]);
             role = (args[0]);
         }
-        if (args.length == 2) {
+        if (args.length >= 2) {
             System.out.println(args[1]);
             timeout = Integer.parseInt(args[1]);
         }
-        if (args.length == 3) {
+        if (args.length >= 3) {
+            System.out.println(args[2]);
             ipAddress = args[2];
         }
         System.out.println("Selected client: " + args[0]);
