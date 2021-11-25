@@ -1,0 +1,31 @@
+<project>
+
+    <target name="clean">
+        <delete dir="build"/>
+    </target>
+
+    <target name="compile">
+        <mkdir dir="build/classes"/>
+        <javac encoding="iso-8859-1" srcdir="src" destdir="build/classes">
+            <classpath>
+                <pathelement path="lib/gson-2.2.2.jar"/>
+                <pathelement path="lib/commons-cli-1.4.jar"/>
+
+            </classpath>
+        </javac>
+
+    </target>
+
+
+
+    <target name="walkover">
+        <mkdir dir="build/jar"/>
+        <jar destfile="build/jar/Walkover.jar" basedir="build/classes">
+            <manifest>
+                <attribute name="Main-Class" value="com.walkover.tablut.client.WalkoverPlayer"/>
+            </manifest>
+            <zipgroupfileset dir="lib" includes="**/*.jar"/>
+        </jar>
+    </target>
+
+</project>

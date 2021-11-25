@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -42,6 +43,7 @@ public class WalkoverClient extends TablutClient{
         } else {
             System.out.println(args[0]);
             role = (args[0]);
+            role = role.toUpperCase();
         }
         if (args.length >= 2) {
             System.out.println(args[1]);
