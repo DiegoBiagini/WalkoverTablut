@@ -34,18 +34,24 @@ However we decided on different weights of each heuristic for the 2 different co
 For more information, especially in regards to the heuristics, read the presentation.
 ## Executing the player
 You can compile the player using Ant with the following command:
-'''
+
+```
 ant compile
-'''
+```
+
 It's possible to create the executable jar typing:
-'''
+
+```
 ant walkover
-'''
+```
+
 Once the jar is available you can run the player with the following command:
-'''
+
+```
 java -jar Walkover.jar WHITE 60 localhost
-'''
+```
+
 The three execution parameters are:
--Player(BLACK or WHITE)
--Maximum time allowed for a move
--Server address
+- Player(BLACK or WHITE)
+- Maximum time allowed for a move
+- Server address
