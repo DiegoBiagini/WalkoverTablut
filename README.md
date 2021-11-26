@@ -6,7 +6,7 @@ The name of our team was Walkover.
 ## The challenge
 This challenge consisted in developing a program (no programming language restriction was enforced) able to play a variant of an old northern European board game, called **Ashton Tablut**.
 
-The program would have to communicate with a server (developed by the organizers) both to receive the current state of the game and send the individual moves that it wants to perform.
+The program had to communicate with a server (developed by the organizers) both to receive the current state of the game and send the individual moves that it wants to perform.
 
 The administrators of the challenge would then go on to pit each of the challenger's programs against each other, like in some kind of tournament.
 
