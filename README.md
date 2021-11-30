@@ -28,6 +28,7 @@ As for the heuristic functions we decided to use almost the same sets of heurist
 - How many enemies and allies are surrounding the king
 - The king's position
 - How free is the main center cross of the board
+
 However we decided on different weights of each heuristic for the 2 different colors.
 
 
